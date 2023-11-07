@@ -7,16 +7,16 @@ import android.view.View;
 import android.widget.TextView;
 
 import com.google.android.material.button.MaterialButton;
-
-import org.w3c.dom.Text;
+import org.mozilla.javascript.Context;
+import org.mozilla.javascript.Scriptable;
 
 public class MainActivity extends AppCompatActivity implements View.OnClickListener{
 
-    private TextView ResultDisplay, SolutionDisplay;
-    MaterialButton ClearButton, LBracketButton, RBracketButton;
-    MaterialButton DivideButton, MultiplyButton, MinusButton, PlusButton, EqualButton;
+    private TextView resultDisplay, solutionDisplay;
+    MaterialButton clearButton, lBracketButton, rBracketButton;
+    MaterialButton divideButton, multiplyButton, minusButton, plusButton, equalButton;
     MaterialButton Button0, Button1, Button2, Button3, Button4, Button5, Button6, Button7, Button8, Button9;
-    MaterialButton AllClearButton, DotButton;
+    MaterialButton allClearButton, dotButton;
 
 
     @Override
@@ -24,29 +24,29 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
 
-        ResultDisplay = findViewById(R.id.SolutionDisplay);
-        SolutionDisplay= findViewById(R.id.SolutionDisplay);
+        resultDisplay = findViewById(R.id.resultDisplay);
+        solutionDisplay = findViewById(R.id.solutionDisplay);
 
-        assignId(ClearButton, R.id.ClearButton);
-        assignId(LBracketButton, R.id.LBracketButton);
-        assignId(RBracketButton, R.id.RBracketButton);
-        assignId(DivideButton, R.id.DivideButton);
-        assignId(MultiplyButton, R.id.MultiplyButton);
-        assignId(MinusButton, R.id.MinusButton);
-        assignId(PlusButton, R.id.PlusButton);
-        assignId(EqualButton, R.id.EqualButton);
-        assignId(Button0, R.id.Button0);
-        assignId(Button1, R.id.Button1);
-        assignId(Button2, R.id.Button2);
-        assignId(Button3, R.id.Button3);
-        assignId(Button4, R.id.Button4);
-        assignId(Button5, R.id.Button5);
-        assignId(Button6, R.id.Button6);
-        assignId(Button7, R.id.Button7);
-        assignId(Button8, R.id.Button8);
-        assignId(Button9, R.id.Button9);
-        assignId(AllClearButton, R.id.AllClearButton);
-        assignId(DotButton, R.id.DotButton);
+        assignId(clearButton, R.id.clearButton);
+        assignId(lBracketButton, R.id.lBracketButton);
+        assignId(rBracketButton, R.id.rBracketButton);
+        assignId(divideButton, R.id.divideButton);
+        assignId(multiplyButton, R.id.multiplyButton);
+        assignId(minusButton, R.id.minusButton);
+        assignId(plusButton, R.id.plusButton);
+        assignId(equalButton, R.id.equalButton);
+        assignId(Button0, R.id.button0);
+        assignId(Button1, R.id.button1);
+        assignId(Button2, R.id.button2);
+        assignId(Button3, R.id.button3);
+        assignId(Button4, R.id.button4);
+        assignId(Button5, R.id.button5);
+        assignId(Button6, R.id.button6);
+        assignId(Button7, R.id.button7);
+        assignId(Button8, R.id.button8);
+        assignId(Button9, R.id.button9);
+        assignId(allClearButton, R.id.allClearButton);
+        assignId(dotButton, R.id.dotButton);
     }
 
     void assignId(MaterialButton btn, int id){
@@ -55,7 +55,43 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
     }
 
     @Override
-    public void onClick(View v) {
+    public void onClick(View view) {
+        MaterialButton button = (MaterialButton) view;
+        String buttonText = button.getText().toString();
+        String dataCalculation = solutionDisplay.getText().toString();
+
+        if(buttonText.equals("AC")){
+            solutionDisplay.setText("");
+            resultDisplay.setText("0");
+            return;
+        }
+        if(buttonText.equals("=")){
+            solutionDisplay.setText(resultDisplay.getText());
+            return;
+        }
+        if(buttonText.equals("C")){
+            dataCalculation = dataCalculation.substring(0, dataCalculation.length()-1);
+        } else {
+            dataCalculation = dataCalculation + buttonText;
+        }
+
+        solutionDisplay.setText(dataCalculation);
+        String finalResult = getResult(dataCalculation);
+        if(!finalResult.equals("Err")) {
+            resultDisplay.setText(finalResult);
+        }
+    }
+
+    String getResult(String data){
+        try{
+            Context context = Context.enter();
+            context.setOptimizationLevel(-1);
+            Scriptable scriptable = context.initStandardObjects();
+            String finalResult = context.evaluateString(scriptable, data, "Javascript", 1, null).toString();
+            return finalResult;
+        } catch (Exception e) {
+            return "Err";
+        }
 
     }
 }
